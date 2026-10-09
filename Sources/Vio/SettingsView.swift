@@ -1,10 +1,13 @@
 import SwiftUI
+import FoundationModels
 import Carbon.HIToolbox
 
 struct SettingsView: View {
     @State private var launchAtLogin = LoginItem.isEnabled
     @State private var hotkey = AppSettings.hotkey
     @State private var pushToTalk = AppSettings.pushToTalk
+    @AppStorage("VioCleanupEnabled") private var cleanupEnabled = false
+    @State private var cleanupAvailability = SystemLanguageModel.default.availability
     @State private var shortcutError: String?
     @State private var language = AppSettings.language
     @State private var keywords = UserDefaults.standard.string(forKey: "VioKeywords") ?? ""
@@ -53,6 +56,20 @@ struct SettingsView: View {
                     Text(pushToTalk
                          ? "Hold the shortcut to speak. Release to transcribe and insert text."
                          : "Press the shortcut to start dictating. Press again to transcribe and insert text.")
+                }
+
+                Section {
+                    Toggle("Clean up transcripts", isOn: $cleanupEnabled)
+                        .disabled(cleanupAvailability != .available && !cleanupEnabled)
+                    if let reason = cleanupAvailability.cleanupUnavailableReason {
+                        Text(reason)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                } header: {
+                    Text("Transcript cleanup")
+                } footer: {
+                    Text("Lightly edits punctuation and grammar and removes fillers using Apple Intelligence on your Mac. This can delay pasting. If cleanup fails or takes too long, Vio uses the original transcript.")
                 }
 
                 Section("Recognition") {
@@ -105,7 +122,14 @@ struct SettingsView: View {
             .help("Open github.com/apvarun/vio in your browser")
             .padding(.bottom, 20)
         }
-        .frame(width: 520, height: 570)
+        .frame(width: 520, height: 730)
+        .onAppear(perform: refreshCleanupAvailability)
+        .onReceive(NotificationCenter.default.publisher(for: .vioSettingsWillOpen)) { _ in
+            refreshCleanupAvailability()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
+            refreshCleanupAvailability()
+        }
         .alert("Dictation shortcut unavailable", isPresented: Binding(
             get: { shortcutError != nil },
             set: { if !$0 { shortcutError = nil } }
@@ -114,6 +138,10 @@ struct SettingsView: View {
         } message: {
             Text(shortcutError ?? "")
         }
+    }
+
+    private func refreshCleanupAvailability() {
+        cleanupAvailability = SystemLanguageModel.default.availability
     }
 }
 

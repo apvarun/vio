@@ -44,6 +44,10 @@ Vio asks for microphone access on your first dictation and Accessibility access 
 
 Open Settings… from the menu bar to change the dictation shortcut, turn hold-to-talk on or off, or launch Vio at login. You can also choose a language and add custom words.
 
+Enable **Clean up transcripts** in Settings to lightly edit punctuation, capitalization, and grammar and remove fillers and accidental repetitions before pasting. Cleanup uses Apple's on-device Foundation Models and requires Apple Intelligence to be enabled with its model ready. It is off by default. Cleanup preserves your wording, meaning, and language, but model edits can make mistakes.
+
+Vio shows "Cleaning up…" while it processes the transcript. Cleanup can delay pasting by up to eight seconds. If the model is unavailable, returns no text, fails, exceeds its context limit, or takes too long, Vio automatically delivers the original transcript. Long transcripts are sent as a whole and fall back unchanged if they exceed the model's context limit.
+
 Hold the dictation shortcut, ⌥Space by default, to record. Release it to stop and transcribe. Hold-to-talk is enabled by default. A pulsing red indicator appears near the text caret, or at the top-center of the screen if caret bounds are unavailable. The menu-bar icon turns red. Vio shows an hourglass while it transcribes.
 
 Vio pastes with ⌘V if the original field still has focus, preserving the target app's undo behavior. If you switched fields or apps, it tries to insert the text into the original field through Accessibility. If that fails, it pastes with ⌘V into the current field. Without Accessibility permission, or when Vio is frontmost, it leaves the transcript on the clipboard. After a ⌘V paste, Vio restores your previous clipboard text if you had any and haven't copied other text in the meantime.

@@ -47,6 +47,11 @@ enum AppSettings {
         set { UserDefaults.standard.set(newValue, forKey: "VioPushToTalk") }
     }
 
+    static var cleanupEnabled: Bool {
+        get { UserDefaults.standard.bool(forKey: "VioCleanupEnabled") }
+        set { UserDefaults.standard.set(newValue, forKey: "VioCleanupEnabled") }
+    }
+
     /// ISO code; English by default, "auto" to let the model detect per clip.
     static var language: String {
         get { UserDefaults.standard.string(forKey: "VioLanguage") ?? "en" }

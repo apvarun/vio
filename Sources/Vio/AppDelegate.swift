@@ -85,7 +85,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             symbol = "waveform"
         case .recording:
             symbol = "record.circle"
-        case .transcribing:
+        case .transcribing, .cleaning:
             symbol = "hourglass"
         }
         button.image = NSImage(systemSymbolName: symbol, accessibilityDescription: nil)
@@ -104,6 +104,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             button.toolTip = "Recording, \(verb) \(shortcut) to transcribe"
         case .transcribing:
             button.toolTip = "Transcribing…"
+        case .cleaning:
+            button.toolTip = "Cleaning up…"
         }
     }
 
