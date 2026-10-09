@@ -1,0 +1,43 @@
+name: Build and test
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  macos:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      NEEDLE_TELEMETRY: "0"
+      DO_NOT_TRACK: "1"
+    steps:
+      - uses: actions/checkout@v4.2.2
+      - name: Show toolchain
+        run: |
+          xcodebuild -version
+          swift --version
+          test "$(uname -m)" = arm64
+      - name: Verify pinned assets
+        run: make verify-assets
+      - name: Run tests
+        run: make test
+      - name: Build and sign the app
+        run: make app
+      - name: Check bundle and speech engine
+        run: |
+          codesign --verify --strict build/Vio.app
+          test -f build/Vio.app/Contents/Resources/Licenses/LICENSE
+          test -f build/Vio.app/Contents/Resources/Licenses/Apache-2.0.txt
+          test -f build/Vio.app/Contents/Resources/Licenses/THIRD_PARTY_NOTICES.md
+          python3 - <<'PY'
+          import wave
+          with wave.open('build/silence.wav', 'wb') as output:
+              output.setparams((1, 2, 16000, 0, 'NONE', 'not compressed'))
+              output.writeframes(bytes(32000))
+          PY
+          result=$(build/Vio.app/Contents/MacOS/Vio --selftest build/silence.wav)
+          test "$result" = "(silence, no speech detected)"

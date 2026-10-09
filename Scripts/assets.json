@@ -1,0 +1,17 @@
+[
+  {
+    "path": "Vendor/CNeedle/include/needle.h",
+    "url": "https://huggingface.co/Cactus-Compute/needle3/resolve/2ae11323dc000f5e70c49f7403efa6af12ba9e67/macos-arm64/needle.h",
+    "sha256": "914bbd00423939b02fc349f91cdb7c12531b3f5bb7105b743e0e93c7e409d7b1"
+  },
+  {
+    "path": "Vendor/lib/libneedle.a",
+    "url": "https://huggingface.co/Cactus-Compute/needle3/resolve/2ae11323dc000f5e70c49f7403efa6af12ba9e67/macos-arm64/libneedle.a",
+    "sha256": "98da47c15e1065b4cdc7ddc55e825be78414d4586832db3becaeded39a373df4"
+  },
+  {
+    "path": "Resources/whistle.cact",
+    "url": "https://huggingface.co/Cactus-Compute/whistle/resolve/b358ddadd89b7a713b5aa131f23032d3cca1b251/whistle.cact",
+    "sha256": "b6e02f048568ac5d01a2042556c658061e699acbc0aa2a1439f52f3d461dffeb"
+  }
+]
