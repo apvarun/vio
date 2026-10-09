@@ -4,6 +4,23 @@ Vio is a macOS menu-bar app for speech-to-text dictation. Hold a hotkey, speak, 
 
 Transcription runs on your Mac with [Whistle](https://cactuscompute.com/blog/whistle), a 16.9 MB on-device speech model running in the [needle](https://github.com/cactus-compute/needle) engine (CPU, no server calls, no telemetry).
 
+## Performance
+
+Local CPU transcription measured on an Apple M2 Pro with 32 GB RAM,
+macOS 27, and a release build:
+
+| Speech clip | Transcription time | Faster than real time |
+| --- | --- | --- |
+| 3.98 seconds | 31 ms | 128× |
+| 16.24 seconds | 127 ms | 128× |
+
+Model loading took about 9 ms with the file already in the OS cache. Transcription
+times are medians of five runs after one warm-up, using English speech generated
+by macOS Samantha at 180 words per minute. These measure the speech engine only;
+recording, WAV decoding, optional transcript cleanup, and pasting are excluded.
+Results vary with hardware and audio. See [benchmark instructions](docs/benchmarks.md)
+to reproduce these measurements or try your own recording.
+
 ## Requirements
 
 - Apple Silicon Mac running macOS 26 or newer (the prebuilt engine targets macOS 26 / arm64)

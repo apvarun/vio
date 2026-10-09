@@ -16,9 +16,25 @@ enum Selftest {
         }
         do {
             let samples = try WavReader.mono16kSamples(from: url)
+            let loadStart = DispatchTime.now().uptimeNanoseconds
             try SpeechEngine.shared.loadIfNeeded()
+            let loadSeconds = Double(DispatchTime.now().uptimeNanoseconds - loadStart) / 1e9
             let text = try SpeechEngine.shared.transcribe(samples)
             print(text.isEmpty ? "(silence, no speech detected)" : text)
+            if CommandLine.arguments.contains("--benchmark"), !samples.isEmpty {
+                // The first transcription above warms up the engine. Time the same
+                // path used by dictation, excluding WAV decoding and model loading.
+                var timings: [Double] = []
+                for _ in 0..<5 {
+                    let start = DispatchTime.now().uptimeNanoseconds
+                    _ = try SpeechEngine.shared.transcribe(samples)
+                    timings.append(Double(DispatchTime.now().uptimeNanoseconds - start) / 1e9)
+                }
+                let median = timings.sorted()[2]
+                let duration = Double(samples.count) / 16000
+                print(String(format: "Audio: %.2f s | Model load: %.3f s | Warm transcription median (5 runs): %.3f s | %.1fx real time", duration, loadSeconds, median, duration / median))
+                print("Transcription runs in seconds: " + timings.map { String(format: "%.3f", $0) }.joined(separator: ", "))
+            }
             exit(0)
         } catch {
             FileHandle.standardError.write(Data("selftest failed: \(error.localizedDescription)\n".utf8))
