@@ -1,0 +1,15 @@
+{
+  "tool": "https://dmgly.com/",
+  "export": "Swift / macOS",
+  "background": "background.tiff",
+  "preview": "background.png",
+  "backgroundScales": [1, 2],
+  "iconSource": "../vio.icon",
+  "editableArtwork": "../../Scripts/render-dmg.swift",
+  "window": { "width": 720, "height": 460 },
+  "iconSize": 100,
+  "textSize": 13,
+  "app": { "name": "Vio.app", "x": 195, "y": 230 },
+  "applications": { "x": 525, "y": 230 },
+  "volumeName": "Vio"
+}

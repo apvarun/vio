@@ -3,16 +3,34 @@ APP = build/$(APP_NAME).app
 SWIFT_FLAGS ?=
 PYTHON ?= python3
 WAV ?=
+export SIGNING_IDENTITY
+export NOTARY_PROFILE
 
-.PHONY: app download verify-assets test selftest open clean
+.PHONY: app app-icon dmg release release-check dmg-artwork download verify-assets test selftest open clean
+
+dmg: app dmg-artwork
+	bash Scripts/build-dmg.sh preview
+
+release-check:
+	bash Scripts/build-dmg.sh check-release
+
+release: release-check
+	$(MAKE) app dmg-artwork
+	bash Scripts/build-dmg.sh release
+
+dmg-artwork: app-icon
+	swift Scripts/render-dmg.swift
 
 # SwiftPM tracks source, manifest, and module-map dependencies on every invocation.
-app: verify-assets build/Vio.icns
+app: verify-assets app-icon Resources/MenuBarIcon.pdf
 	swift build -c release $(SWIFT_FLAGS)
+	rm -rf "$(APP)"
 	mkdir -p "$(APP)/Contents/MacOS" "$(APP)/Contents/Resources/Licenses"
 	cp "$$(swift build -c release $(SWIFT_FLAGS) --show-bin-path)/$(APP_NAME)" "$(APP)/Contents/MacOS/$(APP_NAME)"
 	cp Resources/whistle.cact "$(APP)/Contents/Resources/"
 	cp build/Vio.icns "$(APP)/Contents/Resources/"
+	cp build/composer-icons/Assets.car "$(APP)/Contents/Resources/"
+	cp Resources/MenuBarIcon.pdf "$(APP)/Contents/Resources/"
 	cp Info.plist "$(APP)/Contents/"
 	cp LICENSE THIRD_PARTY_NOTICES.md Licenses/Apache-2.0.txt "$(APP)/Contents/Resources/Licenses/"
 	codesign --force --sign - "$(APP)"
@@ -24,13 +42,16 @@ app: verify-assets build/Vio.icns
 verify-assets:
 	$(PYTHON) Scripts/assets.py verify
 
-build/Vio.icns: Resources/vio-icon-flat-teal.png
-	mkdir -p build/Vio.iconset
-	for size in 16 32 128 256 512; do \
-		sips -z $$size $$size "$<" --out "build/Vio.iconset/icon_$${size}x$${size}.png" >/dev/null; \
-		sips -z $$((size * 2)) $$((size * 2)) "$<" --out "build/Vio.iconset/icon_$${size}x$${size}@2x.png" >/dev/null; \
-	done
-	iconutil -c icns build/Vio.iconset -o "$@"
+Resources/MenuBarIcon.pdf: Resources/vio.icon/Assets/vio_heart_like_waveform_white.svg Scripts/render-menubar-icon.swift
+	swift Scripts/render-menubar-icon.swift
+
+app-icon:
+	rm -rf build/composer-icons
+	mkdir -p build/composer-icons
+	xcrun actool Resources/vio.icon --compile build/composer-icons \
+		--platform macosx --minimum-deployment-target 26.0 --app-icon vio \
+		--output-partial-info-plist build/composer-icons/Info.plist
+	cp build/composer-icons/vio.icns build/Vio.icns
 
 download:
 	$(PYTHON) Scripts/assets.py download

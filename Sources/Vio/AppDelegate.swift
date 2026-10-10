@@ -2,6 +2,15 @@ import AppKit
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private var statusItem: NSStatusItem?
+    private lazy var idleIcon: NSImage? = {
+        guard let url = Bundle.main.url(forResource: "MenuBarIcon", withExtension: "pdf"),
+              let image = NSImage(contentsOf: url) else {
+            return NSImage(systemSymbolName: "waveform", accessibilityDescription: "Vio")
+        }
+        image.isTemplate = true
+        image.accessibilityDescription = "Vio"
+        return image
+    }()
     private let dictation = DictationController()
 
     func applicationDidFinishLaunching(_ notification: Notification) {
@@ -79,16 +88,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func updateAppearance(for state: DictationController.State) {
         guard let button = statusItem?.button else { return }
-        let symbol: String
         switch state {
         case .idle:
-            symbol = "waveform"
+            button.image = idleIcon
         case .recording:
-            symbol = "record.circle"
+            button.image = NSImage(systemSymbolName: "record.circle", accessibilityDescription: "Recording")
         case .transcribing, .cleaning:
-            symbol = "hourglass"
+            button.image = NSImage(systemSymbolName: "hourglass", accessibilityDescription: "Processing")
         }
-        button.image = NSImage(systemSymbolName: symbol, accessibilityDescription: nil)
         button.contentTintColor = state == .recording ? .systemRed : nil
         updateTooltip()
     }

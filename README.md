@@ -21,6 +21,16 @@ This builds and launches `build/Vio.app`. Use `make app` to build without launch
 
 The engine and model are bundled. If asset verification fails, run `make download` to restore them, then retry.
 
+## Installers and signed releases
+
+Run `make dmg` to build the dark teal drag-to-Applications installer. Install its
+packaging dependency with `brew install create-dmg` first. Local previews are not
+notarized.
+
+Run `make release` with `SIGNING_IDENTITY` and `NOTARY_PROFILE` configured to
+produce a signed, notarized DMG and SHA-256 checksum. See the
+[release instructions](docs/releases.md) for Keychain setup and publishing.
+
 ## Use Vio
 
 1. Grant Accessibility access at launch and microphone access on your first dictation.

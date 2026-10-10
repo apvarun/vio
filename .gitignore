@@ -4,3 +4,8 @@ build/
 *.wav
 __pycache__/
 *.pyc
+*.p12
+*.p8
+*.key
+.env
+.env.*
